@@ -17,3 +17,7 @@ The usage can be mostly seen in command line help.
 ### Dependency Definition File
 
 A Dependency Definition File is a yaml file. It can define repositories and dependencies. If there are dependencies specified on command line, the ones in the file will be ignore. If there are repositories specified on command line, the ones in the fill will ALSO BE USED. For exact format, please refer to the documentation about app.yml on the README of codejive/java-jpm.
+
+## Credits
+
+This is a fork of codejive/java-jpm. Most of the works are done the the original author.
