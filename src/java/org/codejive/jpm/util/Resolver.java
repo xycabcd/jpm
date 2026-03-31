@@ -70,7 +70,7 @@ public class Resolver {
         ContextOverrides.Builder ctxb =
                 ContextOverrides.create()
                         .withUserSettings(true)
-                        .withLocalRepositoryOverride(cacheDir);
+                        .withMavenUserHomeOverride(cacheDir);
         if (repositories != null && !repositories.isEmpty()) {
             ctxb.repositories(repositories);
         }
