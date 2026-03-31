@@ -44,14 +44,23 @@ public class Main {
         @Mixin VerboseMixin verboseMixin;
         @Mixin QuietMixin quietMixin;
         @Mixin AppInfoFileMixin appInfoFileMixin;
+        @Mixin DepsMixin depsMixin
         
         @Parameters(
                 paramLabel = "<target>",
-                description = "The directory to copy files to"
+                description = "The directory to copy files to",
+                index = "0"
         )
         private Path directory;
         
-        @Mixin OptionalArtifactsMixin artifactsMixin;
+        @Parameters(
+                paramLabel = "artifacts",
+                description =
+                        "One or more artifacts to resolve. Artifacts have the format <group>:<artifact>[:<extension>[:<classifier>]]:<version>",
+                arity = "0..*",
+                index="1..*"
+        )
+        private String[] artifactNames = {};
 
         @Option(
                 names = {"-c", "--clear"},
@@ -72,12 +81,12 @@ public class Main {
                     Jpm.builder()
                             .directory(directory)
                             .noLinks(!symlink)
-                            .cacheDir(artifactsMixin.getCacheDir())
+                            .cacheDir(depsMixin.getCacheDir())
                             .appFile(appInfoFileMixin.file)
                             .build()
                             .copy(
-                                    artifactsMixin.artifactNames,
-                                    artifactsMixin.getRepositoryMap(),
+                                    artifactNames,
+                                    depsMixin.getRepositoryMap(),
                                     sync);
             if (!quietMixin.quiet) {
                 printStats(stats);
@@ -96,19 +105,27 @@ public class Main {
                             + "Example:\n  jpm path org.apache.httpcomponents:httpclient:4.5.14\n")
     static class PrintPath implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
-        @Mixin OptionalArtifactsMixin optionalArtifactsMixin;
+        @Mixin DepsMixin depsMixin
+        
+        @Parameters(
+                paramLabel = "artifacts",
+                description =
+                        "One or more artifacts to resolve. Artifacts have the format <group>:<artifact>[:<extension>[:<classifier>]]:<version>",
+                arity = "0..*")
+        private String[] artifactNames = {};
+        
         @Mixin AppInfoFileMixin appInfoFileMixin;
 
         @Override
         public Integer call() throws Exception {
             List<Path> files =
                     Jpm.builder()
-                            .cacheDir(optionalArtifactsMixin.getCacheDir())
+                            .cacheDir(depsMixin.getCacheDir())
                             .appFile(appInfoFileMixin.file)
                             .build()
                             .path(
-                                    optionalArtifactsMixin.artifactNames,
-                                    optionalArtifactsMixin.getRepositoryMap());
+                                    artifactNames,
+                                    depsMixin.getRepositoryMap());
             if (!files.isEmpty()) {
                 String classpath =
                         files.stream()
@@ -185,24 +202,6 @@ public class Main {
             }
             return repoMap;
         }
-    }
-
-    static class ArtifactsMixin extends DepsMixin {
-        @Parameters(
-                paramLabel = "artifacts",
-                description =
-                        "One or more artifacts to resolve. Artifacts have the format <group>:<artifact>[:<extension>[:<classifier>]]:<version>",
-                arity = "1..*")
-        private String[] artifactNames = {};
-    }
-
-    static class OptionalArtifactsMixin extends DepsMixin {
-        @Parameters(
-                paramLabel = "artifacts",
-                description =
-                        "One or more artifacts to resolve. Artifacts have the format <group>:<artifact>[:<extension>[:<classifier>]]:<version>",
-                arity = "0..*")
-        private String[] artifactNames = {};
     }
 
     static class AppInfoFileMixin {
