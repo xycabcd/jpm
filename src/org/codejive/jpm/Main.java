@@ -44,7 +44,7 @@ public class Main {
         @Mixin VerboseMixin verboseMixin;
         @Mixin QuietMixin quietMixin;
         @Mixin AppInfoFileMixin appInfoFileMixin;
-        @Mixin DepsMixin depsMixin
+        @Mixin DepsMixin depsMixin;
         
         @Parameters(
                 paramLabel = "<target>",
@@ -105,7 +105,7 @@ public class Main {
                             + "Example:\n  jpm path org.apache.httpcomponents:httpclient:4.5.14\n")
     static class PrintPath implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
-        @Mixin DepsMixin depsMixin
+        @Mixin DepsMixin depsMixin;
         
         @Parameters(
                 paramLabel = "artifacts",
