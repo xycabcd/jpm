@@ -1,4 +1,4 @@
 # xycabcd's JPM
-A fork of JPM: Java Package Manager. Work in progress..
+A fork of JPM: Java Package Manager. Work in progress.
 
-### Building
+Note that this will be totally different than upstream JPM.
