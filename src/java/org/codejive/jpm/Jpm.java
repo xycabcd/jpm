@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.codejive.jpm.config.AppInfo;
-import org.codejive.jpm.search.Search;
 import org.codejive.jpm.util.*;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.DependencyResolutionException;

@@ -1,15 +1,3 @@
-// spotless:off Dependencies for JBang
-//DEPS eu.maveniverse.maven.mima:context:2.4.35 eu.maveniverse.maven.mima.runtime:standalone-static:2.4.35
-//DEPS org.apache.maven.indexer:search-backend-smo:7.1.6
-//DEPS info.picocli:picocli:4.7.7
-//DEPS org.yaml:snakeyaml:2.5
-//DEPS org.jline:jline-console-ui:3.30.6 org.jline:jline-terminal-jni:3.30.6
-//DEPS org.slf4j:slf4j-api:2.0.17 org.slf4j:slf4j-simple:2.0.17
-//SOURCES Jpm.java config/AppInfo.java search/Search.java search/SearchSmoRestImpl.java search/SearchSmoApiImpl.java
-//SOURCES util/CommandsParser.java util/FileUtils.java util/Resolver.java util/ScriptUtils.java util/SyncResult.java
-//SOURCES util/Version.java
-// spotless:on
-
 package org.codejive.jpm;
 
 import java.io.*;
@@ -20,21 +8,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
-import org.codejive.jpm.search.Search.Backends;
 import org.codejive.jpm.util.SyncResult;
 import org.codejive.jpm.util.Version;
-import org.jline.consoleui.elements.InputValue;
-import org.jline.consoleui.elements.ListChoice;
-import org.jline.consoleui.elements.PageSizeType;
-import org.jline.consoleui.elements.PromptableElementIF;
-import org.jline.consoleui.elements.items.ListItemIF;
-import org.jline.consoleui.elements.items.impl.ListItem;
-import org.jline.consoleui.prompt.ConsolePrompt;
-import org.jline.consoleui.prompt.ListResult;
-import org.jline.consoleui.prompt.PromptResultItemIF;
-import org.jline.consoleui.prompt.builder.PromptBuilder;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
