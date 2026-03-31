@@ -49,7 +49,7 @@ public class Main {
                 paramLabel = "target directory",
                 description = "The directory to copy files to"
         )
-        private String directory;
+        private Path directory;
         
         @Mixin OptionalArtifactsMixin artifactsMixin;
 
@@ -71,7 +71,7 @@ public class Main {
             SyncResult stats =
                     Jpm.builder()
                             .directory(directory)
-                            .noLinks(!symlinks)
+                            .noLinks(!symlink)
                             .cacheDir(artifactsMixin.getCacheDir())
                             .appFile(appInfoFileMixin.appInfoFile())
                             .build()
