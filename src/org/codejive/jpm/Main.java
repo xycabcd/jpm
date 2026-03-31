@@ -104,7 +104,7 @@ public class Main {
             List<Path> files =
                     Jpm.builder()
                             .cacheDir(optionalArtifactsMixin.getCacheDir())
-                            .appFile(appInfoFileMixin.appInfoFile)
+                            .appFile(appInfoFileMixin.file)
                             .build()
                             .path(
                                     optionalArtifactsMixin.artifactNames,
