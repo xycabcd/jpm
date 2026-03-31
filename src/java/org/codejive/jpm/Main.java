@@ -49,16 +49,8 @@ import picocli.CommandLine.Unmatched;
         versionProvider = Version.class,
         description = "Simple command line tool for managing Maven artifacts",
         subcommands = {
-            Main.Search.class,
-            Main.Install.class,
             Main.Copy.class,
             Main.PrintPath.class,
-            Main.Do.class,
-            Main.Clean.class,
-            Main.Build.class,
-            Main.Run.class,
-            Main.Test.class,
-            Main.Exec.class
         })
 public class Main {
 
@@ -76,22 +68,37 @@ public class Main {
     static class Copy implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
         @Mixin QuietMixin quietMixin;
-        @Mixin ArtifactsMixin artifactsMixin;
+        @Mixin AppInfoFileMixin appInfoFileMixin;
+        
+        @Parameters(
+                paramLabel = "target directory",
+                description = "The directory to copy files to",
+        )
+        private String directory;
+        
+        @Mixin OptionalArtifactsMixin artifactsMixin;
 
         @Option(
-                names = {"-s", "--sync"},
+                names = {"-c", "--clear"},
                 description =
                         "Makes sure the target directory will only contain the mentioned artifacts and their dependencies, possibly removing other files present in the directory",
                 defaultValue = "false")
         private boolean sync;
+        
+                @Option(
+                names = {"-S", "--symblink"},
+                description = "Create symlinks for artifacts",
+                defaultValue = "false")
+        boolean symblink;
 
         @Override
         public Integer call() throws Exception {
             SyncResult stats =
                     Jpm.builder()
-                            .directory(artifactsMixin.directory)
-                            .noLinks(artifactsMixin.noLinks)
+                            .directory(directory)
+                            .noLinks(!symlinks)
                             .cacheDir(artifactsMixin.getCacheDir())
+                            .appFile(appInfoFileMixin.appInfoFile())
                             .build()
                             .copy(
                                     artifactsMixin.artifactNames,
@@ -103,236 +110,7 @@ public class Main {
             return (Integer) 0;
         }
     }
-
-    @Command(
-            name = "search",
-            aliases = {"s"},
-            description =
-                    "Without arguments this command will start an interactive search asking the user to "
-                            + "provide details of the artifact to look for and the actions to take. When provided "
-                            + "with an argument this command finds and returns the names of those artifacts that "
-                            + "match the given (partial) name.\n\n"
-                            + "Example:\n  jpm search httpclient\n")
-    static class Search implements Callable<Integer> {
-        @Mixin VerboseMixin verboseMixin;
-        @Mixin QuietMixin quietMixin;
-        @Mixin DepsMixin depsMixin;
-        @Mixin AppInfoFileMixin appInfoFileMixin;
-
-        @Option(
-                names = {"-i", "--interactive"},
-                description = "Interactively search and select artifacts to install",
-                defaultValue = "false")
-        private boolean interactive;
-
-        @Option(
-                names = {"-m", "--max"},
-                description = "Maximum number of results to return")
-        private Integer max;
-
-        @Option(
-                names = {"-b", "--backend"},
-                description =
-                        "The search backend to use. Supported values: ${COMPLETION-CANDIDATES}")
-        private Backends backend;
-
-        @Parameters(
-                paramLabel = "artifactPattern",
-                description = "Partial or full artifact name to search for.",
-                defaultValue = "")
-        private String artifactPattern;
-
-        @Override
-        public Integer call() throws Exception {
-            if (interactive || artifactPattern == null || artifactPattern.isEmpty()) {
-                if (max == null) {
-                    max = (Integer) 100;
-                }
-                try (Terminal terminal = TerminalBuilder.builder().build()) {
-                    while (true) {
-                        ConsolePrompt.UiConfig cfg = new ConsolePrompt.UiConfig();
-                        cfg.setCancellableFirstPrompt(true);
-                        ConsolePrompt prompt = new ConsolePrompt(null, terminal, cfg);
-                        Map<String, PromptResultItemIF> result = prompt.prompt(this::nextQuestion);
-                        if (result.isEmpty()) {
-                            break;
-                        }
-                        String selectedArtifact = getSelectedId(result, "item");
-                        String artifactAction = getSelectedId(result, "action");
-                        if ("install".equals(artifactAction)) {
-                            SyncResult stats =
-                                    Jpm.builder()
-                                            .directory(depsMixin.directory)
-                                            .noLinks(depsMixin.noLinks)
-                                            .cacheDir(depsMixin.getCacheDir())
-                                            .appFile(appInfoFileMixin.appInfoFile)
-                                            .build()
-                                            .install(
-                                                    new String[] {selectedArtifact},
-                                                    depsMixin.getRepositoryMap());
-                            if (!quietMixin.quiet) {
-                                printStats(stats);
-                            }
-                        } else if ("copy".equals(artifactAction)) {
-                            SyncResult stats =
-                                    Jpm.builder()
-                                            .directory(depsMixin.directory)
-                                            .noLinks(depsMixin.noLinks)
-                                            .cacheDir(depsMixin.getCacheDir())
-                                            .appFile(appInfoFileMixin.appInfoFile)
-                                            .build()
-                                            .copy(
-                                                    new String[] {selectedArtifact},
-                                                    depsMixin.getRepositoryMap(),
-                                                    false);
-                            if (!quietMixin.quiet) {
-                                printStats(stats);
-                            }
-                        } else { // quit
-                            break;
-                        }
-                        String finalAction = selectFinalAction(prompt);
-                        if (!"again".equals(finalAction)) {
-                            break;
-                        }
-                        artifactPattern = null;
-                    }
-                }
-            } else {
-                if (max == null) {
-                    max = (Integer) 20;
-                }
-                try {
-                    String[] artifactNames = search(artifactPattern);
-                    if (artifactNames.length > 0) {
-                        Arrays.stream(artifactNames).forEach(System.out::println);
-                    }
-                } catch (UncheckedIOException ex) {
-                    System.err.println(ex.getCause().getMessage());
-                    return 1;
-                }
-            }
-            return (Integer) 0;
-        }
-
-        String[] search(String artifactPattern) {
-            try {
-                return Jpm.builder()
-                        .directory(depsMixin.directory)
-                        .noLinks(depsMixin.noLinks)
-                        .cacheDir(depsMixin.getCacheDir())
-                        .appFile(appInfoFileMixin.appInfoFile)
-                        .build()
-                        .search(artifactPattern, Math.min(max, 200), backend);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
-
-        List<PromptableElementIF> nextQuestion(Map<String, PromptResultItemIF> results) {
-            String pattern;
-            if (artifactPattern == null || artifactPattern.isEmpty()) {
-                if (!results.containsKey("input")) {
-                    return List.of(stringElement("Search for:"));
-                }
-                pattern = results.get("input").getResult();
-            } else {
-                pattern = artifactPattern;
-            }
-
-            if (!results.containsKey("item")) {
-                String[] artifactNames = search(pattern);
-                return List.of(selectElement("Select artifact:", artifactNames));
-            }
-
-            if (!results.containsKey("action")) {
-                return List.of(selectArtifactActionElement());
-            } else if ("version".equals(getSelectedId(results, "action"))) {
-                results.remove("action");
-                pattern = getSelectedId(results, "item");
-                String[] artifactNames = search(pattern);
-                return List.of(selectElement("Select version:", artifactNames));
-            }
-
-            return null;
-        }
-
-        InputValue stringElement(String message) {
-            return new InputValue("input", message);
-        }
-
-        ListChoice selectElement(String message, String[] items) {
-            List<ListItemIF> itemList =
-                    Arrays.stream(items)
-                            .map(it -> new ListItem(it, it))
-                            .collect(Collectors.toList());
-            return new ListChoice(message, "item", 10, PageSizeType.ABSOLUTE, itemList);
-        }
-
-        ListChoice selectArtifactActionElement() {
-            List<ListItemIF> itemList = new ArrayList<>();
-            itemList.add(new ListItem("Download & Install artifact", "install"));
-            itemList.add(new ListItem("Download & Copy artifact", "copy"));
-            itemList.add(new ListItem("Select different version", "version"));
-            itemList.add(new ListItem("Quit", "quit"));
-            return new ListChoice("What to do:", "action", 10, PageSizeType.ABSOLUTE, itemList);
-        }
-
-        String selectFinalAction(ConsolePrompt prompt) throws IOException {
-            PromptBuilder promptBuilder = prompt.getPromptBuilder();
-            promptBuilder
-                    .createListPrompt()
-                    .name("action")
-                    .message("Next step:")
-                    .newItem("quit")
-                    .text("Quit")
-                    .add()
-                    .newItem("again")
-                    .text("Search again")
-                    .add()
-                    .addPrompt();
-            Map<String, PromptResultItemIF> result = prompt.prompt(promptBuilder.build());
-            return getSelectedId(result, "action");
-        }
-
-        private static String getSelectedId(
-                Map<String, PromptResultItemIF> result, String itemName) {
-            return ((ListResult) result.get(itemName)).getSelectedId();
-        }
-    }
-
-    @Command(
-            name = "install",
-            aliases = {"i"},
-            description =
-                    "This adds the given artifacts to the list of dependencies available in the app.yml file. "
-                            + "It then behaves just like 'copy --sync' and copies all artifacts in that list and all their dependencies to the target directory while at the same time removing any artifacts that are no longer needed (ie the ones that are not mentioned in the app.yml file). "
-                            + "If no artifacts are passed the app.yml file will be left untouched and only the existing dependencies in the file will be copied.\n\n"
-                            + "Example:\n  jpm install org.apache.httpcomponents:httpclient:4.5.14\n")
-    static class Install implements Callable<Integer> {
-        @Mixin VerboseMixin verboseMixin;
-        @Mixin QuietMixin quietMixin;
-        @Mixin OptionalArtifactsMixin optionalArtifactsMixin;
-        @Mixin AppInfoFileMixin appInfoFileMixin;
-
-        @Override
-        public Integer call() throws Exception {
-            SyncResult stats =
-                    Jpm.builder()
-                            .directory(optionalArtifactsMixin.directory)
-                            .noLinks(optionalArtifactsMixin.noLinks)
-                            .cacheDir(optionalArtifactsMixin.getCacheDir())
-                            .appFile(appInfoFileMixin.appInfoFile)
-                            .build()
-                            .install(
-                                    optionalArtifactsMixin.artifactNames,
-                                    optionalArtifactsMixin.getRepositoryMap());
-            if (!quietMixin.quiet) {
-                printStats(stats);
-            }
-            return (Integer) 0;
-        }
-    }
+    
 
     @Command(
             name = "path",
@@ -350,8 +128,6 @@ public class Main {
         public Integer call() throws Exception {
             List<Path> files =
                     Jpm.builder()
-                            .directory(optionalArtifactsMixin.directory)
-                            .noLinks(optionalArtifactsMixin.noLinks)
                             .cacheDir(optionalArtifactsMixin.getCacheDir())
                             .appFile(appInfoFileMixin.appInfoFile)
                             .build()
@@ -369,250 +145,11 @@ public class Main {
         }
     }
 
-    @Command(
-            name = "exec",
-            description =
-                    "Executes a shell command that can use special tokens to deal with OS-specific quirks like paths."
-                            + " This means that commands can be written in a somewhat platform independent way and will work on Windows, Linux and MacOS.\n"
-                            + "\n"
-                            + "Supported tokens and what they expand to:\n"
-                            + "  {{deps}}  : the classpath of all dependencies defined in the app.yml file\n"
-                            + "  {/} : the OS' file path separator\n"
-                            + "  {:} : the OS' class path separator\n"
-                            + "  {~} : the user's home directory using the OS' class path format\n"
-                            + "  {;} : the OS' command separator\n"
-                            + "  {./file/path} : a path using the OS' path format (must start with './'!)\n"
-                            + "  {./lib:./ext} : a class path using the OS' class path format (must start with './'!)\n"
-                            + "  @[ ... ] : writes contents to a file and inserts @<path-to-file> instead\n"
-                            + "\n"
-                            + "In actuality the command is pretty smart and will try to do the right thing, as long as {{deps}} is the only token you use."
-                            + " In the examples below the first line shows how to do it the hard way, by specifying everything manually, while the second line shows how much easier it is when you can rely on the built-in smart feature."
-                            + " Is the smart feature bothering you? Just use any of the other tokens besides {{deps}} and it will be turned off."
-                            + " By default args files will only be considered for Java commands that are know to support them (java, javac, javadoc, etc), but you can indicate that your command supports it as well by adding a single @ as the first character of the command.\n"
-                            + "\n"
-                            + "Example:\n"
-                            + "  jpm exec javac -cp @[{{deps}}] -d {./out/classes} --source-path {./src/main/java} App.java\n"
-                            + "  jpm exec javac -cp {{deps}} -d out/classes --source-path src/main/java App.java\n"
-                            + "  jpm exec @kotlinc -cp {{deps}} -d out/classes src/main/kotlin/App.kt\n")
-    static class Exec implements Callable<Integer> {
-        @Mixin VerboseMixin verboseMixin;
-        @Mixin DepsMixin depsMixin;
-        @Mixin QuietMixin quietMixin;
-        @Mixin AppInfoFileMixin appInfoFileMixin;
+    
 
-        @Parameters(paramLabel = "command", description = "The command to execute", arity = "0..*")
-        private List<String> command;
-
-        @Override
-        public Integer call() throws Exception {
-            String cmd = String.join(" ", command);
-            try {
-                return Jpm.builder()
-                        .directory(depsMixin.directory)
-                        .noLinks(depsMixin.noLinks)
-                        .cacheDir(depsMixin.getCacheDir())
-                        .appFile(appInfoFileMixin.appInfoFile)
-                        .verbose(!quietMixin.quiet)
-                        .build()
-                        .executeCommand(cmd, depsMixin.getRepositoryMap());
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                return 1;
-            }
-        }
-    }
-
-    @Command(
-            name = "do",
-            description =
-                    "Executes an action command defined in the app.yml file."
-                            + " The command is executed using the same rules as the exec command, so it can use all the same tokens and features."
-                            + " You can also pass additional arguments to the action using -a or --arg followed by the argument value."
-                            + " You can chain multiple actions and their arguments in a single command line."
-                            + "\n"
-                            + "Example:\n"
-                            + "  jpm do build\n"
-                            + "  jpm do test --arg verbose\n"
-                            + "  jpm do build -a --fresh test -a verbose\n")
-    static class Do implements Callable<Integer> {
-        @Mixin VerboseMixin verboseMixin;
-        @Mixin DepsMixin depsMixin;
-        @Mixin QuietMixin quietMixin;
-        @Mixin AppInfoFileMixin appInfoFileMixin;
-
-        @Option(
-                names = {"-l", "--list"},
-                description = "List all available actions",
-                defaultValue = "false")
-        private boolean list;
-
-        @Parameters(
-                paramLabel = "action",
-                description = "Name of the action to execute as defined in app.yml",
-                arity = "0..*",
-                index = "0")
-        private String actionName;
-
-        @Parameters(
-                paramLabel = "actionsAndArguments",
-                description =
-                        "Optional additional actions and/or arguments to be passed to the action(s)",
-                arity = "0..*",
-                index = "1..*")
-        private ArrayList<String> actsAndArgs = new ArrayList<>();
-
-        @Override
-        public Integer call() throws Exception {
-            try {
-                if (list) {
-                    List<String> actionNames =
-                            Jpm.builder()
-                                    .directory(depsMixin.directory)
-                                    .noLinks(depsMixin.noLinks)
-                                    .cacheDir(depsMixin.getCacheDir())
-                                    .appFile(appInfoFileMixin.appInfoFile)
-                                    .build()
-                                    .listActions();
-                    if (actionNames.isEmpty()) {
-                        if (!quietMixin.quiet) System.out.println("No actions defined in app.yml");
-                    } else {
-                        if (!quietMixin.quiet) System.out.println("Available actions:");
-                        actionNames.forEach(n -> System.out.println("   " + n));
-                    }
-                } else {
-                    if (actionName == null || actionName.isEmpty()) {
-                        System.err.println(
-                                "Action name is required. Use --list to see available actions.");
-                        return 1;
-                    }
-                    // Split the full arguments list in multiple actions and their arguments
-                    int idx = 0;
-                    actsAndArgs.add(0, actionName);
-                    while (idx < actsAndArgs.size()) {
-                        String action = actsAndArgs.get(idx);
-                        if (action.startsWith("-")) {
-                            System.err.println(
-                                    "Unexpected argument, was expecting an action name: " + action);
-                            return 1;
-                        }
-                        idx++;
-                        List<String> args = new ArrayList<>();
-                        while (idx < actsAndArgs.size() && actsAndArgs.get(idx).startsWith("-")) {
-                            String opt = actsAndArgs.get(idx);
-                            if (opt.equals("-a") || opt.equals("--arg")) {
-                                args.add(actsAndArgs.get(++idx));
-                            } else if (opt.startsWith("-a=") || opt.startsWith("--arg=")) {
-                                args.add(opt.substring(opt.indexOf('=') + 1));
-                            } else {
-                                System.err.println(
-                                        "Unexpected argument, was expecting an action argument like '-a' or '--arg', not: "
-                                                + opt);
-                                return 1;
-                            }
-                            idx++;
-                        }
-                        int exitCode =
-                                Jpm.builder()
-                                        .directory(depsMixin.directory)
-                                        .noLinks(depsMixin.noLinks)
-                                        .cacheDir(depsMixin.getCacheDir())
-                                        .appFile(appInfoFileMixin.appInfoFile)
-                                        .verbose(!quietMixin.quiet)
-                                        .build()
-                                        .executeAction(action, args, depsMixin.getRepositoryMap());
-                        if (exitCode != 0) {
-                            return exitCode;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                return 1;
-            }
-            return 0;
-        }
-    }
-
-    abstract static class DoAlias implements Callable<Integer> {
-        @Mixin VerboseMixin verboseMixin;
-        @Mixin DepsMixin depsMixin;
-        @Mixin AppInfoFileMixin appInfoFileMixin;
-
-        @Unmatched List<String> args = new ArrayList<>();
-
-        abstract String actionName();
-
-        @Override
-        public Integer call() throws Exception {
-            try {
-                // Use only unmatched args for pass-through to preserve ordering
-                return Jpm.builder()
-                        .directory(depsMixin.directory)
-                        .noLinks(depsMixin.noLinks)
-                        .cacheDir(depsMixin.getCacheDir())
-                        .appFile(appInfoFileMixin.appInfoFile)
-                        .build()
-                        .executeAction(actionName(), args, depsMixin.getRepositoryMap());
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                return 1;
-            }
-        }
-    }
-
-    @Command(
-            name = "clean",
-            description = "Executes the 'clean' action as defined in the app.yml file.")
-    static class Clean extends DoAlias {
-        @Override
-        String actionName() {
-            return "clean";
-        }
-    }
-
-    @Command(
-            name = "build",
-            description = "Executes the 'build' action as defined in the app.yml file.")
-    static class Build extends DoAlias {
-        @Override
-        String actionName() {
-            return "build";
-        }
-    }
-
-    @Command(
-            name = "run",
-            description = "Executes the 'run' action as defined in the app.yml file.")
-    static class Run extends DoAlias {
-        @Override
-        String actionName() {
-            return "run";
-        }
-    }
-
-    @Command(
-            name = "test",
-            description = "Executes the 'test' action as defined in the app.yml file.")
-    static class Test extends DoAlias {
-        @Override
-        String actionName() {
-            return "test";
-        }
-    }
+    
 
     static class DepsMixin {
-        @Option(
-                names = {"-d", "--directory"},
-                description = "Directory to copy artifacts to",
-                defaultValue = "deps")
-        Path directory;
-
-        @Option(
-                names = {"-L", "--no-links"},
-                description = "Always copy artifacts, don't try to create symlinks",
-                defaultValue = "false")
-        boolean noLinks;
-
         @Option(
                 names = {"-r", "--repo"},
                 description =
@@ -620,22 +157,22 @@ public class Main {
         List<String> repositories = new ArrayList<>();
 
         @Option(
-                names = {"-c", "--cache"},
+                names = {"-H", "--maven-home"},
                 description =
-                        "Directory where downloaded artifacts will be cached (default: value of JPM_CACHE environment variable; whatever is set in Maven's settings.xml or $HOME/.m2/repository")
+                        "Directory that is the Maven User Home. Defaults to ~/.m2")
         Path cacheDir;
 
         Path getCacheDir() {
             if (cacheDir != null) {
                 return cacheDir;
             }
-            String envCache = System.getenv("JPM_CACHE");
+            String envCache = System.getenv("JPM_HOME");
             if (envCache != null && !envCache.isEmpty()) {
                 try {
                     return Path.of(envCache);
                 } catch (InvalidPathException e) {
                     System.err.println(
-                            "Warning: Invalid path in JPM_CACHE environment variable, ignoring: "
+                            "Warning: Invalid path in JPM_HOME environment variable, ignoring: "
                                     + envCache);
                 }
             }
@@ -691,8 +228,8 @@ public class Main {
 
     static class AppInfoFileMixin {
         @Option(
-                names = {"-a", "--appinfo"},
-                description = "App info file to use (default './app.yml')")
+                names = {"-f", "--file"},
+                description = "App info file to use. Can contain dependencies and repositories")
         Path appInfoFile;
     }
 
@@ -726,7 +263,7 @@ public class Main {
                     ex.printStackTrace();
                 } else {
                     System.err.println(
-                            "(Run with --verbose for more details. If you believe you found a bug in jpm, open an issue at https://github.com/codejive/java-jpm/issues)");
+                            "Run with --verbose for stacktrace and more details.");
                 }
                 return commandLine.getCommandSpec().exitCodeOnExecutionException();
             };

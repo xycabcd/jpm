@@ -134,43 +134,14 @@ public class Jpm {
      * @throws IOException If an error occurred during the copy operation.
      * @throws DependencyResolutionException If an error occurred during the dependency resolution.
      */
-    public SyncResult copy(String[] artifactNames, Map<String, String> repos, boolean sync)
-            throws IOException, DependencyResolutionException {
-        List<Path> files = Resolver.create(artifactNames, repos, cacheDir).resolvePaths();
+    public SyncResult copy(String[] artifactNames, Map<String, String> extraRepos, boolean sync)
+            throws IOException, DependencyResolutionException 
+    {
+        AppInfo appInfo = readAppInfo();
+        String[] deps = getArtifacts(artifactNames, appInfo);
+        Map<String, String> repos = getRepositories(extraRepos, appInfo);
+        List<Path> files = Resolver.create(deps, repos, cacheDir).resolvePaths();
         return FileUtils.syncArtifacts(files, directory, noLinks, !sync);
-    }
-
-    /**
-     * Searches for artifacts matching the given pattern.
-     *
-     * @param artifactPattern The pattern to search for.
-     * @param count The maximum number of results to return.
-     * @return An array of artifact names matching the given pattern.
-     * @throws IOException If an error occurred during the search.
-     */
-    public String[] search(String artifactPattern, int count) throws IOException {
-        return search(artifactPattern, count, null);
-    }
-
-    /**
-     * Searches for artifacts matching the given pattern.
-     *
-     * @param artifactPattern The pattern to search for.
-     * @param count The maximum number of results to return.
-     * @return An array of artifact names matching the given pattern.
-     * @throws IOException If an error occurred during the search.
-     */
-    public String[] search(String artifactPattern, int count, Search.Backends backend)
-            throws IOException {
-        List<Artifact> artifacts = new ArrayList<>();
-        int max = count <= 0 || count > 200 ? 200 : count;
-        Search s = Search.getBackend(backend);
-        Search.SearchResult result = s.findArtifacts(artifactPattern, max);
-        while (result != null) {
-            artifacts.addAll(result.artifacts);
-            result = count <= 0 ? s.findNextArtifacts(result) : null;
-        }
-        return artifacts.stream().map(Jpm::artifactGav).toArray(String[]::new);
     }
 
     private static String artifactGav(Artifact artifact) {
@@ -188,10 +159,11 @@ public class Jpm {
      * @throws IOException If an error occurred during the install operation.
      * @throws DependencyResolutionException If an error occurred during the dependency resolution.
      */
+    /*
     public SyncResult install(String[] artifactNames)
             throws IOException, DependencyResolutionException {
         return install(artifactNames, Collections.emptyMap());
-    }
+    }*/
 
     /**
      * Installs the given artifacts to the target directory while also registering them as
@@ -205,6 +177,7 @@ public class Jpm {
      * @throws IOException If an error occurred during the install operation.
      * @throws DependencyResolutionException If an error occurred during the dependency resolution.
      */
+    /*
     public SyncResult install(String[] artifactNames, Map<String, String> extraRepos)
             throws IOException, DependencyResolutionException {
         AppInfo appInfo = readAppInfo();
@@ -222,7 +195,7 @@ public class Jpm {
         } else {
             return new SyncResult();
         }
-    }
+    }*/
 
     /**
      * Returns the paths of the given artifacts. If no artifacts are given, the paths for all
@@ -255,12 +228,7 @@ public class Jpm {
         Map<String, String> repos = getRepositories(extraRepos, appInfo);
         if (deps.length > 0) {
             List<Path> files = Resolver.create(deps, repos, cacheDir).resolvePaths();
-            if (artifactNames.length > 0) {
-                return files;
-            } else {
-                SyncResult result = FileUtils.syncArtifacts(files, directory, noLinks, true);
-                return result.files;
-            }
+            return files;
         } else {
             return Collections.emptyList();
         }
@@ -282,107 +250,7 @@ public class Jpm {
         return repos;
     }
 
-    /**
-     * Executes an action defined in app.yml file.
-     *
-     * @param actionName The name of the action to execute
-     * @return An integer containing the exit result of the action
-     * @throws IllegalArgumentException If the action name is not provided or not found
-     * @throws IOException If an error occurred during the operation
-     * @throws DependencyResolutionException If an error occurred during dependency resolution
-     * @throws InterruptedException If the action execution was interrupted
-     */
-    public int executeAction(String actionName, List<String> args)
-            throws IOException, DependencyResolutionException, InterruptedException {
-        return executeAction(actionName, args, Collections.emptyMap());
-    }
-
-    /**
-     * Executes an action defined in app.yml file.
-     *
-     * @param actionName The name of the action to execute
-     * @param args A list of additional arguments to pass to the action command
-     * @param extraRepos A map of additional repository names to URLs where artifacts can be found.
-     * @return An integer containing the exit result of the action
-     * @throws IllegalArgumentException If the action name is not provided or not found
-     * @throws IOException If an error occurred during the operation
-     * @throws DependencyResolutionException If an error occurred during dependency resolution
-     * @throws InterruptedException If the action execution was interrupted
-     */
-    public int executeAction(String actionName, List<String> args, Map<String, String> extraRepos)
-            throws IOException, DependencyResolutionException, InterruptedException {
-        AppInfo appInfo = readAppInfo();
-
-        // Get the action command
-        String command = appInfo.getAction(actionName);
-        if (command == null) {
-            throw new IllegalArgumentException(
-                    "Action '"
-                            + actionName
-                            + "' not found in app.yml. Use --list to see available actions.");
-        }
-
-        // Add the user arguments to the command
-        if (args != null && !args.isEmpty()) {
-            command +=
-                    args.stream()
-                            .map(ScriptUtils::quoteArgument)
-                            .collect(Collectors.joining(" ", " ", ""));
-        }
-
-        return executeCommand(command, extraRepos);
-    }
-
-    /**
-     * Returns a list of available action names defined in the app.yml file.
-     *
-     * @return A list of available action names
-     * @throws IOException If an error occurred during the operation
-     */
-    public List<String> listActions() throws IOException {
-        AppInfo appInfo = readAppInfo();
-        return new ArrayList<>(appInfo.getActionNames());
-    }
-
-    /**
-     * Executes an action defined in app.yml file.
-     *
-     * @param command The command to execute
-     * @return An integer containing the exit result of the action
-     * @throws IOException If an error occurred during the operation
-     * @throws DependencyResolutionException If an error occurred during dependency resolution
-     * @throws InterruptedException If the action execution was interrupted
-     */
-    public int executeCommand(String command)
-            throws IOException, DependencyResolutionException, InterruptedException {
-        return executeCommand(command, Collections.emptyMap());
-    }
-
-    /**
-     * Executes an action defined in app.yml file.
-     *
-     * @param command The command to execute
-     * @param extraRepos A map of additional repository names to URLs where artifacts can be found.
-     * @return An integer containing the exit result of the action
-     * @throws IOException If an error occurred during the operation
-     * @throws DependencyResolutionException If an error occurred during dependency resolution
-     * @throws InterruptedException If the action execution was interrupted
-     */
-    public int executeCommand(String command, Map<String, String> extraRepos)
-            throws IOException, DependencyResolutionException, InterruptedException {
-        // Get the classpath for variable substitution only if needed
-        List<Path> classpath = Collections.emptyList();
-        if (command.contains("{{deps}}")) {
-            classpath =
-                    this.path(
-                            new String[0],
-                            extraRepos); // Empty array means use dependencies from app.yml
-        }
-
-        return ScriptUtils.executeScript(command, classpath, verbose);
-    }
-
     private AppInfo readAppInfo() throws IOException {
-        return (appFile != null) ? AppInfo.read(appFile) : AppInfo.read();
+        return AppInfo.read(appFile);
     }
 }

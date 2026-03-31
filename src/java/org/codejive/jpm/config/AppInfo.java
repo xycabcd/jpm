@@ -27,48 +27,12 @@ public class AppInfo {
     /** The official name of the app.yml file. */
     public static final String APP_INFO_FILE = "app.yml";
 
-    public String name() {
-        return (String) yaml.get("name");
-    }
-
-    public String description() {
-        return (String) yaml.get("description");
-    }
-
-    public String documentation() {
-        return (String) yaml.get("documentation");
-    }
-
-    public String java() {
-        return (String) yaml.get("java");
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> authors() {
-        if (yaml.get("authors") instanceof List) {
-            return (List<String>) yaml.get("authors");
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> contributors() {
-        if (yaml.get("contributors") instanceof List) {
-            return (List<String>) yaml.get("contributors");
-        }
-        return null;
-    }
-
     public List<String> dependencies() {
         return dependencies;
     }
 
     public Map<String, String> repositories() {
         return repositories;
-    }
-
-    public Map<String, String> actions() {
-        return actions;
     }
 
     /**
@@ -78,38 +42,6 @@ public class AppInfo {
      */
     public String[] getDependencyGAVs() {
         return dependencies.toArray(String[]::new);
-    }
-
-    /**
-     * Returns the action command for the given action name.
-     *
-     * @param actionName The name of the action
-     * @return The action command or null if not found
-     */
-    public String getAction(String actionName) {
-        return actions != null ? actions.get(actionName) : null;
-    }
-
-    /**
-     * Returns all available action names.
-     *
-     * @return A set of action names
-     */
-    public java.util.Set<String> getActionNames() {
-        return actions != null ? actions.keySet() : java.util.Collections.emptySet();
-    }
-
-    /**
-     * Reads the app.yml file in the current directory and returns its content as an AppInfo object.
-     * If the file does not exist, an empty AppInfo object is returned.
-     *
-     * @return An instance of AppInfo
-     * @throws IOException if an error occurred while reading or parsing the file
-     */
-    @SuppressWarnings("unchecked")
-    public static AppInfo read() throws IOException {
-        Path appInfoFile = Paths.get(System.getProperty("user.dir"), APP_INFO_FILE);
-        return read(appInfoFile);
     }
 
     /**
@@ -168,13 +100,6 @@ public class AppInfo {
                 appInfo.repositories.put(entry.getKey(), entry.getValue().toString());
             }
         }
-        // Parse actions section
-        if (appInfo.yaml.containsKey("actions") && appInfo.yaml.get("actions") instanceof Map) {
-            Map<String, Object> actions = (Map<String, Object>) appInfo.yaml.get("actions");
-            for (Map.Entry<String, Object> entry : actions.entrySet()) {
-                appInfo.actions.put(entry.getKey(), entry.getValue().toString());
-            }
-        }
         return appInfo;
     }
 
@@ -183,12 +108,12 @@ public class AppInfo {
      *
      * @param appInfo The AppInfo object to write
      * @throws IOException if an error occurred while writing the file
-     */
+     *//*
     @SuppressWarnings("unchecked")
     public static void write(AppInfo appInfo) throws IOException {
         Path appInfoFile = Paths.get(System.getProperty("user.dir"), APP_INFO_FILE);
         write(appInfo, appInfoFile);
-    }
+    }*/
 
     /**
      * Writes the AppInfo object to the given path.
@@ -196,20 +121,20 @@ public class AppInfo {
      * @param appInfo The AppInfo object to write
      * @param appInfoFile The path to write the app.yml file to
      * @throws IOException if an error occurred while writing the file
-     */
+     *//*
     @SuppressWarnings("unchecked")
     public static void write(AppInfo appInfo, Path appInfoFile) throws IOException {
         try (Writer out = Files.newBufferedWriter(appInfoFile)) {
             write(appInfo, out);
         }
-    }
+    }*/
 
     /**
      * Writes the AppInfo object to the given Writer.
      *
      * @param appInfo The AppInfo object to write
      * @param out The Writer to write to
-     */
+     *//*
     @SuppressWarnings("unchecked")
     public static void write(AppInfo appInfo, Writer out) {
         DumperOptions dopts = new DumperOptions();
@@ -229,5 +154,5 @@ public class AppInfo {
             appInfo.yaml.remove("actions");
         }
         yaml.dump(appInfo.yaml, out);
-    }
+    }*/
 }
