@@ -47,7 +47,7 @@ public class Main {
         
         @Parameters(
                 paramLabel = "target directory",
-                description = "The directory to copy files to",
+                description = "The directory to copy files to"
         )
         private String directory;
         
