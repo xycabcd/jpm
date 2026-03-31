@@ -135,9 +135,11 @@ public class Main {
                 names = {"-H", "--maven-home"},
                 description =
                         "Directory that is the Maven User Home. Defaults to ~/.m2")
-        Path cacheDir;
+        Path homeDir;
 
         Path getCacheDir() {
+            Path cacheDir = homeDir;
+            
             if (cacheDir != null) {
                 return cacheDir;
             }

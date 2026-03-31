@@ -54,7 +54,7 @@ public class AppInfo {
      */
     @SuppressWarnings("unchecked")
     public static AppInfo read(Path appInfoFile) throws IOException {
-        if (Files.isRegularFile(appInfoFile)) {
+        if (appInfoFile != null && Files.isRegularFile(appInfoFile)) {
             try (Reader in = Files.newBufferedReader(appInfoFile)) {
                 return read(in);
             }
