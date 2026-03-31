@@ -20,4 +20,4 @@ A Dependency Definition File is a yaml file. It can define repositories and depe
 
 ## Credits
 
-This is a fork of codejive/java-jpm. Most of the works are done the the original author.
+This is a fork of codejive/java-jpm. Most of the works are done by the original author.
