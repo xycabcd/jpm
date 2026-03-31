@@ -37,8 +37,8 @@ public class Main {
             name = "copy",
             aliases = {"c"},
             description =
-                    "Resolves one or more artifacts and copies them and all their dependencies to a target directory. "
-                            + "By default jpm will try to create symbolic links to conserve space.\n\n"
+                    "Resolves artifacts and copies them and all their dependencies to a target directory. "
+                            + "If no artifacts are passed the classpath for the dependencies defined in the app.yml file will be printed instead.\n\n"
                             + "Example:\n  jpm copy org.apache.httpcomponents:httpclient:4.5.14\n")
     static class Copy implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
@@ -46,7 +46,7 @@ public class Main {
         @Mixin AppInfoFileMixin appInfoFileMixin;
         
         @Parameters(
-                paramLabel = "target directory",
+                paramLabel = "<target>",
                 description = "The directory to copy files to"
         )
         private Path directory;
@@ -73,7 +73,7 @@ public class Main {
                             .directory(directory)
                             .noLinks(!symlink)
                             .cacheDir(artifactsMixin.getCacheDir())
-                            .appFile(appInfoFileMixin.appInfoFile)
+                            .appFile(appInfoFileMixin.file)
                             .build()
                             .copy(
                                     artifactsMixin.artifactNames,
@@ -91,7 +91,7 @@ public class Main {
             name = "path",
             aliases = {"p"},
             description =
-                    "Resolves one or more artifacts and prints the full classpath to standard output. "
+                    "Resolves artifacts and prints the full classpath to standard output. "
                             + "If no artifacts are passed the classpath for the dependencies defined in the app.yml file will be printed instead.\n\n"
                             + "Example:\n  jpm path org.apache.httpcomponents:httpclient:4.5.14\n")
     static class PrintPath implements Callable<Integer> {
@@ -206,8 +206,8 @@ public class Main {
     static class AppInfoFileMixin {
         @Option(
                 names = {"-f", "--file"},
-                description = "App info file to use. Can contain dependencies and repositories")
-        Path appInfoFile;
+                description = "Dependency decleration file to use")
+        Path file;
     }
 
     static class VerboseMixin {

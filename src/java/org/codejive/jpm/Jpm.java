@@ -148,55 +148,6 @@ public class Jpm {
     }
 
     /**
-     * Installs the given artifacts to the target directory while also registering them as
-     * dependencies in the app.yml file in the current directory. If no artifacts are given, all
-     * dependencies in the app.yml file will be installed. NB: "installation" in this context
-     * basically means sync-copying the artifacts to the target directory.
-     *
-     * @param artifactNames The artifacts to install.
-     * @return An instance of {@link SyncResult} containing the statistics of the install operation.
-     * @throws IOException If an error occurred during the install operation.
-     * @throws DependencyResolutionException If an error occurred during the dependency resolution.
-     */
-    /*
-    public SyncResult install(String[] artifactNames)
-            throws IOException, DependencyResolutionException {
-        return install(artifactNames, Collections.emptyMap());
-    }*/
-
-    /**
-     * Installs the given artifacts to the target directory while also registering them as
-     * dependencies in the app.yml file in the current directory. If no artifacts are given, all
-     * dependencies in the app.yml file will be installed. NB: "installation" in this context
-     * basically means sync-copying the artifacts to the target directory.
-     *
-     * @param artifactNames The artifacts to install.
-     * @param extraRepos A map of additional repository names to URLs where artifacts can be found.
-     * @return An instance of {@link SyncResult} containing the statistics of the install operation.
-     * @throws IOException If an error occurred during the install operation.
-     * @throws DependencyResolutionException If an error occurred during the dependency resolution.
-     */
-    /*
-    public SyncResult install(String[] artifactNames, Map<String, String> extraRepos)
-            throws IOException, DependencyResolutionException {
-        AppInfo appInfo = readAppInfo();
-        String[] artifacts = getArtifacts(artifactNames, appInfo);
-        Map<String, String> repos = getRepositories(extraRepos, appInfo);
-        if (artifacts.length > 0) {
-            List<Path> files = Resolver.create(artifacts, repos, cacheDir).resolvePaths();
-            SyncResult stats = FileUtils.syncArtifacts(files, directory, noLinks, true);
-            if (artifactNames.length > 0) {
-                appInfo.dependencies().addAll(Arrays.asList(artifactNames));
-                appInfo.repositories().putAll(repos);
-                AppInfo.write(appInfo);
-            }
-            return stats;
-        } else {
-            return new SyncResult();
-        }
-    }*/
-
-    /**
      * Returns the paths of the given artifacts. If no artifacts are given, the paths for all
      * dependencies in the app.yml file will be returned instead.
      *
