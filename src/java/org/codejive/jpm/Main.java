@@ -64,7 +64,7 @@ public class Main {
                 names = {"-S", "--symblink"},
                 description = "Create symlinks for artifacts",
                 defaultValue = "false")
-        boolean symblink;
+        boolean symlink;
 
         @Override
         public Integer call() throws Exception {
@@ -73,7 +73,7 @@ public class Main {
                             .directory(directory)
                             .noLinks(!symlink)
                             .cacheDir(artifactsMixin.getCacheDir())
-                            .appFile(appInfoFileMixin.appInfoFile())
+                            .appFile(appInfoFileMixin.appInfoFile)
                             .build()
                             .copy(
                                     artifactsMixin.artifactNames,
