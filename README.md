@@ -6,4 +6,4 @@ Note that this will be totally different than upstream JPM.
 ## Building
 Use anything to get the dependencies specified in `jpm.yml`. 
 
-Do `javac -cp [compiled dependencies classpath] --source 17 [all of the source files]`
+Use any compiler to build the source code with Java 17 and the classpath of the dependencies.
