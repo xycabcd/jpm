@@ -24,4 +24,4 @@ A Dependency Definition File is a yaml file. It can define repositories and depe
 
 ## Credits
 
-This is a fork of codejive/java-jpm. Most of the works are done by the original author. License of original work is in `LICENSE-original` file.
+This is a fork of codejive/java-jpm. Most of the works are done by the original author. License of original work is in the `upstream-legal.txt` file.
