@@ -1,4 +1,4 @@
-# xycabcd's JPM
+# abcd's JPM
 
 Forked from codejive/java-jpm to make the tool as minimal and standalone as possible.
 
