@@ -10,6 +10,8 @@ Use any compiler to build the source code with Java 17 and the classpath of the 
 
 ## Using JPM
 
+`org.codejive.jpm.Main` is the main class.
+
 Usage can be mostly seen in command line help.
 
 Note that JPM will read some settings in the MavenUserHome directory (default of `~/.m2`), and download artifacts in `[MavenUserHome]/repository`. If you want to change where that directory is located, use the `-H` option or set `JPM_HOME` environment variable. Other than that, JPM will (probably?) not touch anything else on your system.
