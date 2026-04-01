@@ -38,7 +38,7 @@ public class Main {
             aliases = {"c"},
             description =
                     "Resolves artifacts and copies them and all their dependencies to a target directory. "
-                            + "If no artifacts are passed the classpath for the dependencies defined in the app.yml file will be printed instead.\n\n"
+                            + "If no artifacts are passed the dependencies defined in the definition file will be used.\n\n"
                             + "Example:\n  jpm copy org.apache.httpcomponents:httpclient:4.5.14\n")
     static class Copy implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
@@ -101,7 +101,7 @@ public class Main {
             aliases = {"p"},
             description =
                     "Resolves artifacts and prints the full classpath to standard output. "
-                            + "If no artifacts are passed the classpath for the dependencies defined in the app.yml file will be printed instead.\n\n"
+                            + "If no artifacts are passed the dependencies defined in the definition file will be used.\n\n"
                             + "Example:\n  jpm path org.apache.httpcomponents:httpclient:4.5.14\n")
     static class PrintPath implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
