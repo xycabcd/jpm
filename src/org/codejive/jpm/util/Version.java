@@ -12,7 +12,7 @@ public class Version implements CommandLine.IVersionProvider {
      */
     public static String get() {
         String version = Version.class.getPackage().getImplementationVersion();
-        return version != null ? version : "0.0.0";
+        return version != null ? version : "none";
     }
 
     @Override
