@@ -4,7 +4,7 @@ Forked from codejive/java-jpm to make the tool as minimal and standalone as poss
 
 ## Building
 
-Use anything to get the dependencies specified in `deps.yml`. 
+Use anything to get the dependencies specified in `deps.yml`. This file itself is compatible with both this project's definition file and the upstream project's app.yml file.
 
 Use any compiler to build the source code with Java 17 and the classpath of the dependencies.
 
