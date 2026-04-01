@@ -10,7 +10,7 @@ Use any compiler to build the source code with Java 17 and the classpath of the 
 
 ## Using JPM
 
-`org.codejive.jpm.Main` is the main class.
+`org.codejive.jpm.Main` is the main class. The dependencies are needed to be included in classpath when running.
 
 Usage can be mostly seen in command line help.
 
