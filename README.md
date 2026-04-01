@@ -12,9 +12,9 @@ Use any compiler to build the source code with Java 17 and the classpath of the 
 
 `org.codejive.jpm.Main` is the main class. The dependencies are needed to be included in classpath when running.
 
-Usage can be mostly seen in command line help.
+Usage can be mostly seen in command line help. Please note that the commands have very different usage than the original ones. So please read the help carefully.
 
-Note that JPM will read some settings in the MavenUserHome directory (default of `~/.m2`), and download artifacts to `[MavenUserHome]/repository`. If you want to change where that directory is located, use the `-H` option or set `JPM_HOME` environment variable. Other than that, JPM will (probably?) not touch anything else on your system.
+JPM will read some settings in the MavenUserHome directory (default of `~/.m2`), and download artifacts to `[MavenUserHome]/repository`. If you want to change where that directory is located, use the `-H` option or set `JPM_HOME` environment variable. Other than that, JPM will (probably?) not touch anything else on your system.
 
 It says that using `JPM_REPO_[...]` environment variables can set the user name and password for repositories, but I'm not sure if it works and I can't test it. If you tried it, please post the result in discussions.
 
