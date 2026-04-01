@@ -70,7 +70,7 @@ public class Main {
         private boolean sync;
         
                 @Option(
-                names = {"-S", "--symblink"},
+                names = {"-s", "--symblink"},
                 description = "Create symlinks for artifacts",
                 defaultValue = "false")
         boolean symlink;
