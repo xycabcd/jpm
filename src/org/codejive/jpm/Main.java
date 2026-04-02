@@ -236,7 +236,8 @@ public class Main {
 
     static CommandLine.IExecutionExceptionHandler errorHandler =
             (ex, commandLine, parseResult) -> {
-                System.err.println("Error: " + ex.getMessage());
+                System.err.println("Error: "+ex.getClass().getName()+":");
+                System.err.println(+ ex.getMessage());
                 if (verbose) {
                     ex.printStackTrace();
                 } else {
