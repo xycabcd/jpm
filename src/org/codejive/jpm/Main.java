@@ -38,7 +38,7 @@ public class Main {
                 scope = ScopeType.INHERIT
         )
     public void setVerbose(boolean verbose) {
-        verbose = self.verbose;
+        Main.verbose = verbose;
     }
 
     @Command(
