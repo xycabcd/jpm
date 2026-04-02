@@ -32,7 +32,14 @@ public class Main {
 
     static boolean verbose = false;
 
-    @Mixin VerboseMixin verboseMixin;
+    //@Mixin VerboseMixin verboseMixin;
+
+    @Option(
+                names = {"-v", "--verbose"},
+                description = "Enable verbose output for debugging",
+                scope = ScopeType.INHERIT
+        )
+    boolean _verbose;
 
     @Command(
             name = "copy",
@@ -213,7 +220,7 @@ public class Main {
                 description = "Dependency decleration file to use")
         Path file;
     }
-
+/*
     static class VerboseMixin {
         @Option(
                 names = {"-v", "--verbose"},
@@ -221,7 +228,7 @@ public class Main {
                 scope = ScopeType.INHERIT
         )
         boolean verbose;
-    }
+    }*/
 
     static class QuietMixin {
         @Option(
