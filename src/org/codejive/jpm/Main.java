@@ -231,7 +231,7 @@ public class Main {
     }
 
     static class HelpMixin {
-         @Option(names = {"-h", "--help"}, usageHelp = true, description = "Show this help message and exit.")
+         @Option(names = {"--help"}, usageHelp = true, description = "Show this help message and exit.")
         private boolean help;
     }
 
