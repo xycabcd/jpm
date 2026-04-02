@@ -240,11 +240,13 @@ public class Main {
 
     static CommandLine.IExecutionExceptionHandler errorHandler =
             (ex, commandLine, parseResult) -> {
+                // Here will be a list of special cases
                 if (ex instanceof java.nio.file.FileAlreadyExistsException) {
                     System.err.println("Error: File already exist: "+ex.getMessage());
                 } else {
                     System.err.println("Error: "+ex.getMessage());
                 }
+                    
                 if (verbose) {
                     ex.printStackTrace();
                 } else {
