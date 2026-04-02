@@ -45,6 +45,7 @@ public class Main {
         @Mixin QuietMixin quietMixin;
         @Mixin AppInfoFileMixin appInfoFileMixin;
         @Mixin DepsMixin depsMixin;
+        @Mixin HelpMixin _helpMixin;
         
         @Parameters(
                 paramLabel = "<target>",
@@ -106,6 +107,7 @@ public class Main {
     static class PrintPath implements Callable<Integer> {
         @Mixin VerboseMixin verboseMixin;
         @Mixin DepsMixin depsMixin;
+        @Mixin HelpMixin _helpMixin;
         
         @Parameters(
                 paramLabel = "artifacts",
@@ -226,6 +228,11 @@ public class Main {
                 description = "Don't output non-essential information",
                 defaultValue = "false")
         private boolean quiet;
+    }
+
+    static class HelpMixin {
+         @Option(names = {"-h", "--help"}, usageHelp = true, description = "Show this help message and exit.")
+        private boolean help;
     }
 
     private static void printStats(SyncResult stats) {
