@@ -14,6 +14,8 @@ Use any compiler to build the source code with Java 17 and the classpath of the 
 
 Usage can be mostly seen in command line help. Please note that the commands have very different usage than the original ones. So please read the help carefully.
 
+The `--verbose, -v` flag is the only flag that can be passed globally and affect subcommands. The `--version, -V` and `--help, -h` only works without subcommands. The rest only work with subcommands. Currently, the subcommands have no help flag, but passing a `--help` is an illegal usage and will still trigger help.
+
 JPM supports a `@filename` argument file option, similar to what `java` command provide. For it's usage, please see https://picocli.info/#AtFiles
 
 JPM will read some settings in the MavenUserHome directory (default of `~/.m2`), and download artifacts to `[MavenUserHome]/repository`. If you want to change where that directory is located, use the `-H` option or set `JPM_HOME` environment variable. Other than that, JPM will (probably?) not touch anything else on your system.
