@@ -249,7 +249,7 @@ public class Main {
                 } else {
                     System.err.println("Error: "+ex.getMessage());
                 }
-                if (parseResult.hashMatchedOption("--verbose")) {
+                if (parseResult.hasMatchedOption("--verbose")) {
                     ex.printStackTrace();
                 } else {
                     System.err.println(
