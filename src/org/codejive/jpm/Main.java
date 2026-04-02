@@ -256,7 +256,7 @@ public class Main {
                 } else {
                     System.err.println("Error: "+ex.getMessage());
                 }
-                if (parseResult.hasMatchedOption("--verbose")) {
+                if (((Main)commandLine.getCommand())._verbose) {
                     ex.printStackTrace();
                 } else {
                     System.err.println(
