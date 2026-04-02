@@ -236,8 +236,11 @@ public class Main {
 
     static CommandLine.IExecutionExceptionHandler errorHandler =
             (ex, commandLine, parseResult) -> {
-                System.err.println("Error: "+ex.getClass().getName()+" :");
-                System.err.println(ex.getMessage());
+                if (ex instanceof java.nio.file.FileAlreadyExistsException) {
+                    System.err.println("Error: File already exist: "+ex.getMessage());
+                } else {
+                    System.err.println("Error: "+ex.getMessage());
+                }
                 if (verbose) {
                     ex.printStackTrace();
                 } else {
