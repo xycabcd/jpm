@@ -32,14 +32,14 @@ public class Main {
 
     static boolean verbose = false;
 
-    //@Mixin VerboseMixin verboseMixin;
-
     @Option(
                 names = {"-v", "--verbose"},
                 description = "Enable verbose output for debugging",
                 scope = ScopeType.INHERIT
         )
-    boolean _verbose;
+    public void setVerbose(boolean verbose) {
+        verbose = self.verbose;
+    }
 
     @Command(
             name = "copy",
@@ -49,7 +49,6 @@ public class Main {
                             + "If no artifacts are passed the dependencies defined in the definition file will be used.\n\n"
                             + "Example:\n  jpm copy org.apache.httpcomponents:httpclient:4.5.14\n")
     static class Copy implements Callable<Integer> {
-        //@Mixin VerboseMixin verboseMixin;
         @Mixin QuietMixin quietMixin;
         @Mixin AppInfoFileMixin appInfoFileMixin;
         @Mixin DepsMixin depsMixin;
@@ -113,7 +112,6 @@ public class Main {
                             + "If no artifacts are passed the dependencies defined in the definition file will be used.\n\n"
                             + "Example:\n  jpm path org.apache.httpcomponents:httpclient:4.5.14\n")
     static class PrintPath implements Callable<Integer> {
-        //@Mixin VerboseMixin verboseMixin;
         @Mixin DepsMixin depsMixin;
         @Mixin HelpMixin _helpMixin;
         
@@ -220,15 +218,6 @@ public class Main {
                 description = "Dependency decleration file to use")
         Path file;
     }
-/*
-    static class VerboseMixin {
-        @Option(
-                names = {"-v", "--verbose"},
-                description = "Enable verbose output for debugging",
-                scope = ScopeType.INHERIT
-        )
-        boolean verbose;
-    }*/
 
     static class QuietMixin {
         @Option(
@@ -256,7 +245,7 @@ public class Main {
                 } else {
                     System.err.println("Error: "+ex.getMessage());
                 }
-                if (((Main)commandLine.getCommand())._verbose) {
+                if (verbose) {
                     ex.printStackTrace();
                 } else {
                     System.err.println(
