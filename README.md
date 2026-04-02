@@ -20,7 +20,9 @@ JPM supports a `@filename` argument file option, similar to what `java` command 
 
 JPM will read some settings in the MavenUserHome directory (default of `~/.m2`), and download artifacts to `[MavenUserHome]/repository`. If you want to change where that directory is located, use the `-H` option or set `JPM_HOME` environment variable. Other than that, JPM will (probably?) not touch anything else on your system.
 
-It says that using `JPM_REPO_[...]` environment variables can set the user name and password for repositories, but I'm not sure if it works and I can't test it. If you tried it, please post the result in discussions.
+It says that using `JPM_REPO_[...]` environment variables can set the user name and password for repositories, but I'm not sure if it works and I can't test it. If you tried it, please post the result in Discussions.
+
+JPM print the "message" of an Java Exception as error message, but some of them can be very unclear. If you found one, please report it in the Discussions.
 
 ### Dependency Definition File
 
