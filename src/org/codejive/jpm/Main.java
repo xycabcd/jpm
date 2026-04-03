@@ -261,7 +261,8 @@ public class Main {
                 .setStopAtPositional(true)
                 .setAllowOptionsAsOptionParameters(true)
                 .setAllowSubcommandsAsOptionParameters(true)
-                .setExecutionExceptionHandler(errorHandler);
+                .setExecutionExceptionHandler(errorHandler)
+                .setExpandAtFiles(false);
     }
 
     /**

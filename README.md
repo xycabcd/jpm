@@ -16,8 +16,6 @@ Usage can be mostly seen in command line help. Please note that the commands hav
 
 The `--verbose, -v` flag is the only flag that can be passed globally and affect subcommands. The `--version, -V` only works without subcommands. The `--help, -h` print global help when passed globally. The rest only work with subcommands. 
 
-JPM supports a `@filename` argument file option, similar to what `java` command provide. For it's usage, please see https://picocli.info/#AtFiles
-
 JPM will read some settings in the MavenUserHome directory (default of `~/.m2`), and download artifacts to `[MavenUserHome]/repository`. If you want to change where that directory is located, use the `-H` option or set `JPM_HOME` environment variable. Other than that, JPM will (probably?) not touch anything else on your system.
 
 It says that using `JPM_REPO_[...]` environment variables can set the user name and password for repositories, but I'm not sure if it works and I can't test it. If you tried it, please post the result in Discussions.
