@@ -24,7 +24,7 @@ JPM print the "message" of an Java Exception as error message, but some of them 
 
 ### Dependency Definition File
 
-A Dependency Definition File is a yaml file. It can define repositories and dependencies. If there are dependencies specified on command line, the ones in the file will be ignore. If there are repositories specified on command line, the ones in the fill will ALSO BE USED. For exact format, please refer to the documentation about app.yml on the README of codejive/java-jpm.
+A Dependency Definition File is a yaml file. It can define repositories and dependencies. If there are dependencies specified on command line, the ones in the file will be ignore. If there are repositories specified on command line, the ones in the file will ALSO BE USED. For exact format, please refer to the documentation about app.yml on the README of codejive/java-jpm.
 
 ## Credits
 
