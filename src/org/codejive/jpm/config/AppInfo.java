@@ -24,9 +24,6 @@ public class AppInfo {
     private final Map<String, String> repositories = new LinkedHashMap<>();
     private final Map<String, String> actions = new LinkedHashMap<>();
 
-    /** The official name of the app.yml file. */
-    public static final String APP_INFO_FILE = "app.yml";
-
     public List<String> dependencies() {
         return dependencies;
     }
