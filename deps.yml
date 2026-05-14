@@ -1,6 +1,6 @@
 dependencies:
-  eu.maveniverse.maven.mima:context: 2.4.35
-  eu.maveniverse.maven.mima.runtime:standalone-static: 2.4.35
-  info.picocli:picocli: 4.7.7
-  org.yaml:snakeyaml: '2.5'
-  org.slf4j:slf4j-simple: 2.0.17
+  - eu.maveniverse.maven.mima:context:2.4.35
+  - eu.maveniverse.maven.mima.runtime:standalone-static:2.4.35
+  - info.picocli:picocli:4.7.7
+  - org.yaml:snakeyaml:2.5
+  - org.slf4j:slf4j-simple:2.0.17
