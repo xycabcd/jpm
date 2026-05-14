@@ -47,7 +47,7 @@ public class Main {
             description =
                     "Resolves artifacts and copies them and all their dependencies to a target directory. "
                             + "If no artifacts are passed the dependencies defined in the definition file will be used.\n\n"
-                            + "Example:\n  jpm copy org.apache.httpcomponents:httpclient:4.5.14\n")
+                            + "Example:\n  jpm copy dir org.apache.httpcomponents:httpclient:4.5.14\n")
     static class Copy implements Callable<Integer> {
         @Mixin QuietMixin quietMixin;
         @Mixin AppInfoFileMixin appInfoFileMixin;
