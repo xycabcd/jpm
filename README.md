@@ -8,6 +8,10 @@ Use anything to get the dependencies specified in `deps.yml`. This file itself i
 
 Use any compiler to build the source code with Java 17 and the classpath of the dependencies.
 
+## Pre-built binaries
+
+Binary will be avalible with a release. It is a archive file that contains a directory. The directory will contain a `jpm.jar` and a `lib` directory that contains other jars. `jpm.jar` and `lib` must be in the same directory at runtime. Run `java -jar jpm.jar` to run.
+
 ## Using JPM
 
 `org.codejive.jpm.Main` is the main class. The dependencies are needed to be included in classpath when running.
