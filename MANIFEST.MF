@@ -1,2 +1,3 @@
 Main-Class: org.codejive.jpm.Main
 Implementation-Version: 
+Class-Path: 
