@@ -1,0 +1,7 @@
+1. 源码编译为class文件
+2. 将所有依赖拷进lib文件夹
+3. 输出文件夹下所有文件夹的列表，注意路径开头要有 lib/ 。每一项换一行，行首有一个空格
+4. 将这个列表拷到MANIFEST.MF的Class-Path项中
+5. 设置Implementation-Version
+6. jar -c -f [目标文件] -e org.codejive.jpm.Main -m MANIFEST.MF -C [class文件路径]
+7. 将jar文件和lib放到一个文件夹里
