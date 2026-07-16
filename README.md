@@ -2,6 +2,10 @@
 
 Forked from codejive/java-jpm to make the tool as minimal and standalone as possible.
 
+codejive/java-jpm tries to make a user experience similar to "npm". For example, it's main feature is a "install" command that add a entry to a file and copy it to a directory. 
+
+However, this fork tries to make a user interface that only fetches dependencies you have passed as arguments and lists their paths. It tries to be minimal and flexable.
+
 ## Building
 
 Use anything to get the dependencies specified in `deps.yml`. This file itself is compatible with both this project's definition file and the upstream project's app.yml file.
