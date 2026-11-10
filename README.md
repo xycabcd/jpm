@@ -6,6 +6,8 @@ codejive/java-jpm tries to make a user experience similar to "npm". For example,
 
 However, this fork tries to make a user interface that only fetches dependencies you have passed as arguments and lists their paths. It tries to be minimal and flexable.
 
+(欢迎中文提问和讨论！) 
+
 ## Building
 
 Use anything to get the dependencies specified in `deps.yml`. This file itself is compatible with both this project's definition file and the upstream project's app.yml file.
